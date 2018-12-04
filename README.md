@@ -1,3 +1,0 @@
-# DAT505CreativeCoding
-
-MESSAGE
