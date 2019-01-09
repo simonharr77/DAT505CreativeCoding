@@ -1,6 +1,10 @@
-var shelfAction;
+//var shelfAction;
 var chairAction;
+var boxAction;
 var doorAction;
+var certAction;
+var boxlidAction;
+var shelfAction;
 
 var INTERSECTED;
 var clock;
@@ -20,15 +24,9 @@ function onDocumentMouseMove( event ) {
   mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 }
 
-
 function init() {
   clock = new THREE.Clock();
   scene = new THREE.Scene();
-
-  camera = new THREE.PerspectiveCamera( 100, window.innerWidth / window.innerHeight, 0.1, 1000 );
-  // camera.position.set( - 5, -5, 10 );
-  camera.lookAt( new THREE.Vector3( 0, 2, 0 ) );
-
 
   raycaster = new THREE.Raycaster();
   mouse = new THREE.Vector2();
@@ -40,65 +38,60 @@ function init() {
 
   animationGroup = new THREE.Object3D();
 
-  // create an AudioListener and add it to the camera
-  var listener = new THREE.AudioListener();
-  camera.add( listener );
-
-  // create the PositionalAudio object (passing in the listener)
-  var sound = new THREE.PositionalAudio( listener );
-
-  // load a sound and set it as the PositionalAudio object's buffer
-  // var audioLoader = new THREE.AudioLoader();
-  // audioLoader.load( 'sounds/spinning.mp3', function( buffer ) {
-  // 	sound.setBuffer( buffer );
-  // 	sound.setRefDistance( 2 );
-  //   actionsound1 = sound.play();
-  // });
-
   var loader = new THREE.GLTFLoader();
   loader.load(
-    'models/gltf/Room2.glb',
+    'models/gltf/Room.glb',
     function ( gltf ) {
       var model = gltf.scene;
+
       // scene.add(model);
       mixer = new THREE.AnimationMixer(model);
       console.log({ mixer })
 
-console.log(gltf.animations);
 
-      shelfAction = mixer.clipAction(gltf.animations[0]);
-      shelfAction.setLoop( THREE.LoopOnce );
-
-      chairAction = mixer.clipAction(gltf.animations[1])
-      chairAction.setLoop(THREE.LoopOnce)
-
-      doorAction = mixer.clipAction(gltf.animations[2])
+      console.log(gltf.animations);
+      doorAction = mixer.clipAction(gltf.animations[0])
       doorAction.setLoop(THREE.LoopOnce)
 
-      gltf.scene.position.set(0, -1, 0);
+      chairAction = mixer.clipAction(gltf.animations[1]);
+      chairAction.setLoop( THREE.LoopOnce );
+
+      boxAction = mixer.clipAction(gltf.animations[2])
+      boxAction.setLoop(THREE.LoopOnce)
+
+      bookAction = mixer.clipAction(gltf.animations[3])
+      bookAction.setLoop(THREE.LoopOnce)
+
+      boxlidAction = mixer.clipAction(gltf.animations[4])
+      boxlidAction.setLoop(THREE.LoopOnce)
+
+      certAction = mixer.clipAction(gltf.animations[5])
+      certAction.setLoop(THREE.LoopOnce)
+
+      shelfAction = mixer.clipAction(gltf.animations[6])
+      shelfAction.setLoop(THREE.LoopOnce)
+
+
+      gltf.scene.position.set(2, -3, 0);
       animationGroup.add(model);
       scene.add(model);
+
     }
   );
 
-  //	LIGHT
-  // var light = new THREE.HemisphereLight( 0xffffbb, 0x080820, 10 );
-  // scene.add( light );
-  light = new THREE.PointLight(0xffffff, 0.8, 5);
-  light.position.set(0, 0, 5);
-  scene.add(light);
+
   var spotLight = new THREE.SpotLight( 0xffffff );
-  spotLight.position.set( 0, 5, 10 );
+  spotLight.position.set(  4,  4,  4 );
+  spotLight.intensity = 1;
+  spotLight.penumbra = 1.2;
   scene.add( spotLight );
 
-  // var spotLightHelper = new THREE.SpotLightHelper( spotLight );
-  // scene.add( spotLightHelper );
+  camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 100 );
+  camera.position.set( 4,  1,  4);
+  camera.rotation.set(-0.2,0.8,0.2);
 
-  camera.position.z = 5;
-  camera.position.set( 0, 0, 5 );
 
-  var controls = new THREE.OrbitControls( camera );
-  controls.update();
+
 }
 console.log('function 1');
 
@@ -106,7 +99,7 @@ console.log('function 1');
 var animate = function () {
 
   document.addEventListener( 'mouseup', onDocumentMouseUp, false )
-  // var intersects = raycaster.intersectObjects(animationGroup.children);
+
 
   requestAnimationFrame( animate );
 
@@ -118,14 +111,19 @@ var animate = function () {
 
   renderer.render( scene, camera );
 
+
 };
 
 window.onload = function () {
+
   init();
   animate();
-  // renderer.gammaInput = true;
+  renderer.capabilities.getMaxAnisotropy()
+  renderer.gammaFactor = 2;
   renderer.gammaOutput = true;
+
 }
+
 
 function onDocumentMouseUp( event ) {
   event.preventDefault();
@@ -133,28 +131,40 @@ function onDocumentMouseUp( event ) {
   mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
   raycaster.setFromCamera( mouse, camera );
   var intersects = raycaster.intersectObjects( scene.children, true );
-
+  raycaster.linePrecision = 1;
   if ( intersects.length > 0 ) {
 
     var object = intersects[ 0 ].object;
     console.log('intersecting with', object)
-    if (object.name == 'Cube.006_3' || object.name == 'Cube.006_1') {
-  
-
-
-      shelfAction.stop();
-      shelfAction.play();
-      //shelfAction.clampWhenFinished = true;
-
-      // actionsound1.stop();
-      // actionsound1.play();
-    } else if (object.name == '') {
+    if (object.name == 'Cube.009_2' || object.name == 'Cube.009_0') {
       chairAction.stop();
       chairAction.play();
 
-    }  else if (object.name == 'hinge.001Action') {
+    } else if (object.name == 'Cert02') {
+      certAction.stop();
+      certAction.play();
+      certAction.clampWhenFinished = true;
+
+    }  else if (object.name == 'Box_lid02' || object.name == 'Box02') {
+      boxlidAction.stop();
+      boxlidAction.play();
+      boxlidAction.clampWhenFinished = true;
+
+    } else if (object.name == 'Plane.000_2' || object.name == 'Plane.000_0' ) {
+      bookAction.stop();
+      bookAction.play();
+
+    } else if (object.name == 'Box01') {
+      boxAction.stop();
+      boxAction.play();
+
+    }else if (object.name == 'Cube.006_1' || object.name == 'Cube.006_3') {
+      shelfAction.stop();
+      shelfAction.play();
+
+    } else if (object.name == 'Cylinder.001_0') {
       doorAction.stop();
-      door.play();
+      doorAction.play();
 
     }
 
@@ -162,16 +172,18 @@ function onDocumentMouseUp( event ) {
       console.log(object.uuid, mixer.getRoot())
     }
 
+
     if ( INTERSECTED !== object ) {
 
-      // if ( INTERSECTED ) INTERSECTED.material.program = programStroke;
+
       INTERSECTED = object;
-      // INTERSECTED.material.program = programFill;
+
     }
   } else if ( INTERSECTED ) {
-    // INTERSECTED.material.program = programStroke;
+
+
     INTERSECTED = null;
   }
-  // renderer.render( scene, camera );
+
 
 }
