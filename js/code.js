@@ -1,3 +1,5 @@
+
+//set up variables for the animation actions
 var mapAction;
 var chairAction;
 var boxAction;
@@ -5,7 +7,7 @@ var doorAction;
 var certAction;
 var boxlidAction;
 var shelfAction;
-
+//variables for the raycaster, scene and camera
 var INTERSECTED;
 var clock;
 var scene;
@@ -37,7 +39,7 @@ function onDocumentMouseMove( event ) {
 function init() {
   clock = new THREE.Clock();
   scene = new THREE.Scene();
-
+//set up raycaster
   raycaster = new THREE.Raycaster();
   mouse = new THREE.Vector2();
   renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -45,9 +47,9 @@ function init() {
 
   document.body.appendChild( renderer.domElement );
   renderer.setClearColor(0x606060);
-
+//animation set up
   animationGroup = new THREE.Object3D();
-
+//gltf loader...loads files exported from blender
   var loader = new THREE.GLTFLoader();
   loader.load(
     'models/gltf/Room.glb',
@@ -58,7 +60,7 @@ function init() {
       mixer = new THREE.AnimationMixer(model);
       console.log({ mixer })
 
-
+//animations created in blender and loaded using gltf loader. there order are logged in console log
       console.log(gltf.animations);
       doorAction = mixer.clipAction(gltf.animations[0])
       doorAction.setLoop(THREE.LoopOnce)
@@ -93,7 +95,7 @@ function init() {
 
     });
 
-
+//lights and camera settings
   var spotLight = new THREE.SpotLight( 0xffffff );
   spotLight.position.set(  4,  4,  4 );
   spotLight.intensity = 1;
@@ -109,11 +111,10 @@ function init() {
 }
 console.log('function 1');
 
-
+//animation within three and the rendering
 var animate = function () {
 
   document.addEventListener( 'mouseup', onDocumentMouseUp, false )
-
 
   requestAnimationFrame( animate );
 
@@ -127,7 +128,7 @@ var animate = function () {
 
 
 };
-
+//used on start up
 window.onload = function () {
 
   init();
@@ -139,7 +140,7 @@ window.onload = function () {
 
 }
 
-
+//mouse up function and raycaster, when mouse click is released the raycaster determines if anything was hit
 function onDocumentMouseUp( event ) {
   event.preventDefault();
   mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
@@ -151,12 +152,12 @@ function onDocumentMouseUp( event ) {
 
     var object = intersects[ 0 ].object;
     console.log('intersecting with', object)
-
+//if the raycaster hits any of these objects it will play the animation connected to it. names are exported with the glb file. can be seen in console log.
     if (object.name == 'Cube.009_2' || object.name == 'Cube.009_0') {
       chairAction.stop();
       chairAction.play();
       chairAction.clampWhenFinished = true;
-        
+
 
     } else if (object.name == 'Cert02') {
       certAction.stop();
