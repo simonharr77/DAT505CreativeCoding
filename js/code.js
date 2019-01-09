@@ -1,4 +1,4 @@
-//var shelfAction;
+var mapAction;
 var chairAction;
 var boxAction;
 var doorAction;
@@ -15,9 +15,19 @@ var mouse;
 var renderer;
 var mixer;
 var referenceThing = {}
-var outputEncoding = true
-var gammaOutput = true
+//listener for resizing
+window.addEventListener( 'resize', onWindowResize, false );
+//resize function
+function onWindowResize(){
 
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+
+    renderer.setSize( window.innerWidth, window.innerHeight );
+
+}
+
+//keeps track of mouse
 function onDocumentMouseMove( event ) {
   event.preventDefault();
   mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
@@ -32,7 +42,7 @@ function init() {
   mouse = new THREE.Vector2();
   renderer = new THREE.WebGLRenderer({ antialias: true });
 
-  renderer.setSize( window.innerWidth, window.innerHeight );
+
   document.body.appendChild( renderer.domElement );
   renderer.setClearColor(0x606060);
 
@@ -56,28 +66,32 @@ function init() {
       chairAction = mixer.clipAction(gltf.animations[1]);
       chairAction.setLoop( THREE.LoopOnce );
 
-      boxAction = mixer.clipAction(gltf.animations[2])
+      mapAction = mixer.clipAction(gltf.animations[2])
+      mapAction.setLoop(THREE.LoopOnce)
+
+      boxAction = mixer.clipAction(gltf.animations[3])
       boxAction.setLoop(THREE.LoopOnce)
 
-      bookAction = mixer.clipAction(gltf.animations[3])
+      bookAction = mixer.clipAction(gltf.animations[4])
       bookAction.setLoop(THREE.LoopOnce)
 
-      boxlidAction = mixer.clipAction(gltf.animations[4])
+      boxlidAction = mixer.clipAction(gltf.animations[5])
       boxlidAction.setLoop(THREE.LoopOnce)
 
-      certAction = mixer.clipAction(gltf.animations[5])
+      certAction = mixer.clipAction(gltf.animations[6])
       certAction.setLoop(THREE.LoopOnce)
 
-      shelfAction = mixer.clipAction(gltf.animations[6])
+      shelfAction = mixer.clipAction(gltf.animations[7])
       shelfAction.setLoop(THREE.LoopOnce)
+
+
 
 
       gltf.scene.position.set(2, -3, 0);
       animationGroup.add(model);
       scene.add(model);
 
-    }
-  );
+    });
 
 
   var spotLight = new THREE.SpotLight( 0xffffff );
@@ -118,6 +132,7 @@ window.onload = function () {
 
   init();
   animate();
+  renderer.setSize( window.innerWidth, window.innerHeight );
   renderer.capabilities.getMaxAnisotropy()
   renderer.gammaFactor = 2;
   renderer.gammaOutput = true;
@@ -136,9 +151,12 @@ function onDocumentMouseUp( event ) {
 
     var object = intersects[ 0 ].object;
     console.log('intersecting with', object)
+
     if (object.name == 'Cube.009_2' || object.name == 'Cube.009_0') {
       chairAction.stop();
       chairAction.play();
+      chairAction.clampWhenFinished = true;
+        
 
     } else if (object.name == 'Cert02') {
       certAction.stop();
@@ -166,7 +184,11 @@ function onDocumentMouseUp( event ) {
       doorAction.stop();
       doorAction.play();
 
-    }
+  }else if (object.name == 'Map') {
+    mapAction.stop();
+    mapAction.play();
+    mapAction.clampWhenFinished = true;
+}
 
     if (mixer) {
       console.log(object.uuid, mixer.getRoot())
